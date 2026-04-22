@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Checkout | DineDash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0b0b; --card: #141414; --accent: #ff4757;
+            --border: #222; --text: #ffffff; --dim: #888;
+            --success: #2ecc71; --gold: #d4af37;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 40px 20px; }
+
+        .checkout-wrapper { width: 100%; max-width: 550px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.6rem; margin-bottom: 5px; }
+        .breadcrumb { font-size: 0.75rem; color: var(--dim); margin-bottom: 35px; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* --- ORDER SUMMARY GRID --- */
+        .summary-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; 
+        }
+        .summary-item { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 20px; }
+        .summary-item p { font-size: 0.7rem; color: var(--dim); text-transform: uppercase; margin-bottom: 5px; }
+        .summary-item h3 { font-size: 1.2rem; color: var(--text); }
+
+        /* --- PAYMENT SECTION --- */
+        .method-group { margin-bottom: 30px; }
+        .group-label { font-size: 0.8rem; font-weight: 800; color: var(--dim); margin-bottom: 15px; display: block; }
+
+        .payment-tile { 
+            background: #0f0f0f; border: 1px solid var(--border); border-radius: 20px; 
+            padding: 22px; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; gap: 18px;
+            position: relative;
+        }
+        .payment-tile:hover { border-color: var(--dim); }
+        .payment-tile.active { border-color: var(--accent); background: rgba(255, 71, 87, 0.03); }
+        .payment-tile.active::after { content: '✓'; position: absolute; right: 25px; color: var(--accent); font-weight: 900; }
+        
+        .tile-icon { width: 45px; height: 45px; background: var(--card); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        .tile-text h4 { font-size: 1rem; margin-bottom: 2px; }
+        .tile-text p { font-size: 0.75rem; color: var(--dim); }
+
+        .wallet-tag { margin-left: auto; font-weight: 800; color: var(--success); padding-right: 25px; }
+
+        /* --- ACTION BUTTONS --- */
+        .btn-pay-now { 
+            width: 100%; padding: 22px; background: var(--accent); color: white; border: none; 
+            border-radius: 18px; font-weight: 800; font-size: 1.1rem; cursor: pointer; 
+            box-shadow: 0 20px 40px rgba(255, 71, 87, 0.2); margin-top: 10px;
+        }
+        .btn-pay-now:hover { transform: translateY(-3px); box-shadow: 0 25px 50px rgba(255, 71, 87, 0.3); }
+        .btn-pay-now:disabled { background: #222; color: #555; box-shadow: none; cursor: not-allowed; }
+
+        .secure-footer { text-align: center; margin-top: 40px; border-top: 1px solid var(--border); padding: 25px; color: var(--dim); font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+
+<div class="checkout-wrapper">
+    <p class="breadcrumb">Checkout / Secure Payment</p>
+    <h1>Complete Order</h1>
+
+    <div class="summary-grid">
+        <div class="summary-item"><p>Payable Amount</p><h3 id="totalPay">₹0</h3></div>
+        <div class="summary-item"><p>DineDash Order</p><h3 id="orderRef">#DND-0000</h3></div>
+    </div>
+
+    <div class="method-group">
+        <span class="group-label">Digital Credits</span>
+        <div class="payment-tile active" onclick="selectTile('wallet', this)">
+            <div class="tile-icon">💰</div>
+            <div class="tile-text"><h4>DineDash Wallet</h4><p>Instant 1-click payment</p></div>
+            <div class="wallet-tag" id="currentBal">₹0</div>
+        </div>
+    </div>
+
+    <div class="method-group">
+        <span class="group-label">Express Checkout</span>
+        <div class="payment-tile" onclick="selectTile('upi', this)">
+            <div class="tile-icon">⚡</div>
+            <div class="tile-text"><h4>Unified Payments (UPI)</h4><p>Google Pay, PhonePe, Paytm</p></div>
+        </div>
+        <div class="payment-tile" onclick="selectTile('card', this)">
+            <div class="tile-icon">💳</div>
+            <div class="tile-text"><h4>Credit / Debit Cards</h4><p>Visa, Mastercard, Amex</p></div>
+        </div>
+        <div class="payment-tile" onclick="selectTile('netbanking', this)">
+            <div class="tile-icon">🏛️</div>
+            <div class="tile-text"><h4>Net Banking</h4><p>Direct login via 50+ Banks</p></div>
+        </div>
+    </div>
+
+    <div class="method-group">
+        <span class="group-label">Other Options</span>
+        <div class="payment-tile" onclick="selectTile('cod', this)">
+            <div class="tile-icon">📦</div>
+            <div class="tile-text"><h4>Pay on Delivery</h4><p>Cash or Card at your doorstep</p></div>
+        </div>
+    </div>
+
+    <button class="btn-pay-now" id="finalPayBtn" onclick="finalizeTransaction()">Authorize Transaction 🔒</button>
+
+    <div class="secure-footer">
+        🔐 PCI-DSS Compliant Gateway • End-to-End Encryption
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+    let activeMethod = 'wallet';
+    const orderData = JSON.parse(localStorage.getItem('temp_order')) || { total: 0 };
+    const walletData = JSON.parse(localStorage.getItem('userWallet')) || { balance: 0, history: [] };
+
+    // Initial Setup
+    document.getElementById('totalPay').innerText = `₹${orderData.total}`;
+    document.getElementById('orderRef').innerText = `#DND-${Math.floor(1000 + Math.random() * 9000)}`;
+    document.getElementById('currentBal').innerText = `₹${walletData.balance}`;
+
+    function selectTile(method, el) {
+        document.querySelectorAll('.payment-tile').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        activeMethod = method;
+
+        // Wallet guard logic
+        const btn = document.getElementById('finalPayBtn');
+        if(method === 'wallet' && walletData.balance < orderData.total) {
+            btn.disabled = true;
+            btn.innerText = "Insufficient Credits";
+        } else {
+            btn.disabled = false;
+            btn.innerText = "Authorize Transaction 🔒";
+        }
+    }
+
+    function finalizeTransaction() {
+        showConfirmPopup(
+            "Final Authorization", 
+            `Confirm payment of ₹${orderData.total} via ${activeMethod.toUpperCase()}?`, 
+            () => {
+                // 1. Process Wallet Deduction
+                if(activeMethod === 'wallet') {
+                    walletData.balance -= orderData.total;
+                    walletData.history.push({
+                        desc: `Food Order Payment`,
+                        amount: `- ₹${orderData.total}`,
+                        date: new Date().toLocaleDateString()
+                    });
+                    localStorage.setItem('userWallet', JSON.stringify(walletData));
+                }
+
+                // 2. Commit to Admin Registry
+                const masterCart = JSON.parse(localStorage.getItem('cart')) || [];
+                masterCart.push({
+                    id: Date.now(),
+                    ...orderData,
+                    status: 'Preparing',
+                    method: activeMethod,
+                    paid: (activeMethod !== 'cod')
+                });
+                localStorage.setItem('cart', JSON.stringify(masterCart));
+                localStorage.removeItem('temp_order');
+
+                showSuccessPopup("Order Placed Successfully! 🎉", "We are preparing your meal now.");
+                setTimeout(() => window.location.href = 'dashboard.html', 2200);
+            }
+        );
+    }
+</script>
+</body>
+</html>

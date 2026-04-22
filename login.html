@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DineDash | Professional Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080808; --card: #121212; --accent: #ff4757; --text: #ffffff;
+            --input: #1a1a1a; --border: #2a2a2a; --dim: #a0a0a0; --success: #2ecc71;
+        }
+        body.light-mode {
+            --bg: #f0f2f5; --card: #ffffff; --text: #1c1e21;
+            --input: #f5f6f7; --border: #dddfe2; --dim: #606770;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body { 
+            background: var(--bg); color: var(--text); height: 100vh; 
+            display: flex; justify-content: center; align-items: center; 
+            background-image: radial-gradient(circle at 2% 10%, rgba(255, 71, 87, 0.05) 0%, transparent 40%);
+        }
+
+        .auth-container { 
+            display: flex; width: 95%; max-width: 1100px; height: 720px; 
+            background: var(--card); border-radius: 32px; overflow: hidden; 
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5); border: 1px solid var(--border);
+        }
+
+        .image-section { 
+            flex: 1.2; background: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800') center/cover; 
+            position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 50px;
+        }
+        .image-section::after { 
+            content: ''; position: absolute; inset: 0; 
+            background: linear-gradient(to top, var(--bg) 0%, transparent 70%); 
+        }
+
+        .form-section { flex: 1; padding: 50px; display: flex; flex-direction: column; position: relative; overflow-y: auto; }
+        
+        .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .social-btn { 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 12px; border: 1px solid var(--border); border-radius: 14px; 
+            cursor: pointer; font-size: 0.85rem; font-weight: 600; background: var(--input); color: var(--text);
+        }
+        .social-btn:hover { background: var(--border); transform: translateY(-2px); }
+
+        .divider { display: flex; align-items: center; margin: 20px 0; color: var(--dim); font-size: 0.75rem; font-weight: 700; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); margin: 0 15px; }
+
+        .tabs { display: flex; background: var(--input); padding: 6px; border-radius: 16px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .tab { flex: 1; padding: 12px; cursor: pointer; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: var(--dim); text-align: center; }
+        .tab.active { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3); }
+
+        .input-group { margin-bottom: 20px; position: relative; }
+        label { display: block; font-size: 0.75rem; font-weight: 800; color: var(--dim); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        input { 
+            width: 100%; padding: 16px; background: var(--input); border: 2px solid var(--border); 
+            border-radius: 14px; color: var(--text); font-size: 1rem; outline: none;
+        }
+        input:focus { border-color: var(--accent); background: var(--card); }
+        
+        .btn-main { 
+            width: 100%; padding: 18px; background: var(--accent); color: white; border: none; 
+            border-radius: 16px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 10px;
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.2);
+        }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 71, 87, 0.4); }
+        .btn-main:disabled { background: var(--dim); cursor: not-allowed; transform: none; }
+
+        .error-toast { 
+            background: rgba(255, 71, 87, 0.1); color: var(--accent); padding: 12px; 
+            border-radius: 12px; font-size: 0.85rem; font-weight: 600; text-align: center; 
+            margin-bottom: 20px; border: 1px solid rgba(255, 71, 87, 0.2); display: none;
+        }
+
+        .theme-fab { 
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; 
+            border-radius: 30px; background: var(--accent); border: none; color: white; 
+            font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3); z-index: 100; 
+        }
+
+        @media (max-width: 900px) { .image-section { display: none; } .auth-container { max-width: 480px; } }
+    </style>
+</head>
+<body>
+
+    <button class="theme-fab" onclick="toggleTheme()">🌓</button>
+
+    <div class="auth-container">
+        <div class="image-section">
+            <div class="image-text" style="position: relative; z-index: 10;">
+                <h1 style="font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 15px;">Experience <br>DineDash Pro.</h1>
+                <p style="color: #ddd; font-weight: 400;">The ultimate platform for foodies and restaurant partners.</p>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="font-size: 2rem; font-weight: 800; color: var(--accent);">DineDash</h2>
+                <p id="formTitle" style="color: var(--dim); font-weight: 600;">Welcome back to your account</p>
+            </div>
+
+            <div id="errorToast" class="error-toast"></div>
+
+            <div class="social-grid">
+                <button class="social-btn" onclick="socialLogin('Google')">
+                    <img src="https://www.svgrepo.com/show/355037/google.svg" width="18"> Google
+                </button>
+                <button class="social-btn" onclick="socialLogin('Facebook')">
+                    <img src="https://www.svgrepo.com/show/303114/facebook-3.svg" width="18"> Facebook
+                </button>
+            </div>
+
+            <div class="divider">OR USE EMAIL</div>
+
+            <div class="tabs" id="roleTabs">
+                <div class="tab active" onclick="setRole('user', this)">Customer</div>
+                <div class="tab" onclick="setRole('admin', this)">Staff / Admin</div>
+            </div>
+
+            <form id="authForm">
+                <div id="regFields" style="display: none;">
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" id="regName" placeholder="Enter your name">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="example@mail.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                    <span class="toggle-pw" onclick="togglePW()" style="position: absolute; right: 20px; top: 42px; cursor: pointer; color: var(--dim); font-size: 0.7rem; font-weight: 800;">SHOW</span>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; font-size:0.85rem; font-weight: 600; color: var(--dim);">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        <input type="checkbox" id="rememberMe" style="accent-color: var(--accent);"> Remember Me
+                    </label>
+                    <span style="color:var(--accent); cursor:pointer;" onclick="forgotPW()">Forgot Password?</span>
+                </div>
+
+                <button type="submit" class="btn-main" id="submitBtn">Sign In to Account</button>
+            </form>
+
+            <p style="text-align:center; font-size:0.9rem; color:var(--dim); margin-top: 30px; font-weight: 600;">
+                <span id="toggleText">New to DineDash?</span> 
+                <span style="color:var(--accent); cursor:pointer; font-weight:800;" onclick="toggleAuth()">Create an Account</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let currentRole = 'user';
+        let isRegister = false;
+
+        function setRole(role, el) {
+            currentRole = role;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function toggleAuth() {
+            isRegister = !isRegister;
+            document.getElementById('formTitle').innerText = isRegister ? "Create your new account" : "Welcome back to your account";
+            document.getElementById('regFields').style.display = isRegister ? 'block' : 'none';
+            document.getElementById('submitBtn').innerText = isRegister ? "Create Account" : "Sign In to Account";
+            document.getElementById('toggleText').innerText = isRegister ? "Already a member?" : "New to DineDash?";
+        }
+
+        function togglePW() {
+            const input = document.getElementById('password');
+            const btn = document.querySelector('.toggle-pw');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            btn.innerText = input.type === 'password' ? 'SHOW' : 'HIDE';
+        }
+
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+
+        function socialLogin(p) { alert(`Social login with ${p} is for UI demonstration.`); }
+
+        function showError(msg) {
+            const toast = document.getElementById('errorToast');
+            toast.innerText = msg; toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        /* --- FUNCTIONAL AUTHENTICATION LOGIC --- */
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submitBtn');
+
+            btn.disabled = true;
+            btn.innerText = isRegister ? "Creating Account..." : "Signing in...";
+
+            setTimeout(() => {
+                let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+                const hashed = btoa(password); // Match encoding used in script.js
+
+                // 1. MASTER ADMIN BYPASS
+                if (currentRole === 'admin' && email === 'admin@dinedash.com' && password === 'admin123') {
+                    loginSuccess('admin', 'Administrator');
+                    return;
+                }
+
+                if (isRegister) {
+                    if (currentRole === 'admin') {
+                        showError("Admin accounts must be authorized by the system.");
+                    } else if (users.find(u => u.email === email)) {
+                        showError("Email already registered!");
+                    } else {
+                        users.push({ 
+                            name: document.getElementById('regName').value, 
+                            email, 
+                            password: hashed, 
+                            role: 'user' 
+                        });
+                        localStorage.setItem('registeredUsers', JSON.stringify(users));
+                        alert("Success! Please Sign In.");
+                        toggleAuth();
+                    }
+                } else {
+                    // 2. STANDARD LOGIN
+                    const user = users.find(u => u.email === email && u.password === hashed && u.role === currentRole);
+                    if (user) {
+                        loginSuccess(user.role, user.name);
+                    } else {
+                        showError(`Invalid credentials for ${currentRole} role.`);
+                    }
+                }
+                btn.disabled = false;
+                btn.innerText = isRegister ? "Create Account" : "Sign In to Account";
+            }, 1000);
+        });
+
+        function loginSuccess(role, name) {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userRole', role);
+            localStorage.setItem('userName', name);
+            
+            // Redirect based on role
+            window.location.href = (role === 'admin') ? 'admin.html' : 'restaurants.html';
+        }
+
+        function forgotPW() { alert("Password reset link has been sent to your email (Demo)."); }
+    </script>
+</body>
+</html>

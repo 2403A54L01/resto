@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Table - DineDash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #0b0b0b; --card: #141414; --accent: #ff4757; 
+            --border: #222; --text: #ffffff; --dim: #888;
+            --input: #0f0f0f; --nav-bg: rgba(15, 15, 15, 0.9);
+        }
+
+        /* Light Mode Styles */
+        body.light-mode {
+            --bg: #f8f9fa; --card: #ffffff; --text: #1a1a1a;
+            --border: #e0e0e0; --nav-bg: rgba(255, 255, 255, 0.95);
+            --input: #fdfdfd;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s; }
+        
+        body { background: var(--bg); color: var(--text); min-height: 100vh; padding-top: 100px; }
+
+        /* --- NAVIGATION --- */
+        nav { 
+            background: var(--nav-bg); padding: 15px 6%; display: flex; justify-content: space-between; 
+            align-items: center; position: fixed; top: 0; width: 100%; z-index: 1000; 
+            backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+        }
+        .nav-brand { font-family: 'Playfair Display', serif; color: var(--accent); font-size: 1.8rem; font-weight: 900; text-decoration: none; }
+        
+        .theme-btn {
+            background: var(--card); border: 1px solid var(--border); color: var(--text);
+            padding: 8px 18px; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
+        }
+
+        /* --- BOOKING CARD --- */
+        .container { display: flex; justify-content: center; padding: 40px 20px; }
+        .booking-card {
+            background: var(--card); width: 100%; max-width: 550px;
+            padding: 50px; border-radius: 32px; border: 1px solid var(--border);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+        }
+
+        .header-section { text-align: center; margin-bottom: 40px; }
+        .header-section h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--accent); margin-bottom: 10px; }
+
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; color: var(--dim); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; }
+        
+        input, select {
+            width: 100%; padding: 16px 20px; border-radius: 14px; border: 1px solid var(--border);
+            background: var(--input); color: var(--text); outline: none; font-size: 0.95rem;
+        }
+        input:focus { border-color: var(--accent); }
+
+        .btn-reserve {
+            width: 100%; padding: 20px; background: var(--accent); color: white;
+            border: none; border-radius: 16px; font-weight: 800; font-size: 1rem;
+            cursor: pointer; margin-top: 15px; box-shadow: 0 15px 30px rgba(255, 71, 87, 0.3);
+        }
+
+        .back-nav { text-align: center; margin-top: 30px; }
+        .back-nav a { color: var(--accent); text-decoration: none; font-size: 0.9rem; font-weight: 700; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-brand">DineDash</a>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button class="theme-btn" onclick="toggleTheme()">🌓 Theme</button>
+            <a href="dashboard.html" style="background: var(--accent); color: white; padding: 10px 22px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 0.8rem;">Account 👤</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="booking-card">
+            <div class="header-section">
+                <h1 id="resName">Table Booking</h1>
+                <p style="color: var(--dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Skip the waiting line</p>
+            </div>
+
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="userName" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="userPhone" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>How many people?</label>
+                        <select id="guests">
+                            <option value="1">1 Person</option>
+                            <option value="2" selected>2 People</option>
+                            <option value="4">4 People</option>
+                            <option value="6">6+ People</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Any Special Occasion?</label>
+                        <select id="occasion">
+                            <option value="None">Just Dining</option>
+                            <option value="Birthday">Birthday</option>
+                            <option value="Anniversary">Anniversary</option>
+                            <option value="Date Night">Date Night</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Pick a Date</label>
+                        <input type="date" id="bookDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pick a Time</label>
+                        <input type="time" id="bookTime" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-reserve">Confirm My Table 🔒</button>
+            </form>
+
+            <div class="back-nav">
+                <a href="restaurant.html">← Go back to restaurant details</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    
+    <script>
+    // Theme Toggle
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    window.onload = function() {
+        if(localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+        
+        // Security Check
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            alert("Please log in to book your table!");
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Disable Past Dates
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('bookDate').setAttribute('min', today);
+        
+        const selectedRes = localStorage.getItem('selectedRestaurantName') || "the restaurant";
+        document.getElementById('resName').innerText = `Booking at ${selectedRes}`;
+    };
+
+    document.getElementById('bookingForm').onsubmit = function(e) {
+        e.preventDefault();
+        
+        const bookingID = "DND" + Math.random().toString(36).substr(2, 6).toUpperCase();
+        
+        const bookingData = {
+            id: bookingID,
+            name: document.getElementById('userName').value,
+            phone: document.getElementById('userPhone').value,
+            restaurantName: localStorage.getItem('selectedRestaurantName') || "Restaurant",
+            date: document.getElementById('bookDate').value,
+            time: document.getElementById('bookTime').value,
+            guests: document.getElementById('guests').options[document.getElementById('guests').selectedIndex].text,
+            occasion: document.getElementById('occasion').value,
+            status: "PENDING"
+        };
+
+        if(confirm(`Ready to book for ${bookingData.name} on ${bookingData.date}?`)) {
+            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            bookings.push(bookingData);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            
+            // Re-using your success popup logic
+            if(typeof showSuccessPopup === 'function') {
+                showSuccessPopup("Table Reserved! 🎉", "We'll see you there soon.");
+            } else {
+                alert("Table Reserved Successfully!");
+                window.location.href = 'dashboard.html';
+            }
+        }
+    };
+    </script>
+</body>
+</html>

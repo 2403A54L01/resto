@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Restaurants - DineDash</title>
+    
+    <style>
+        :root {
+            --bg-color: #0f0f0f; --card-bg: #1a1a1a; --text-main: #ffffff;
+            --text-dim: #888888; --border: #333333; --nav-bg: #1a1a1a;
+            --accent: #ff4757; --shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        body.light-mode {
+            --bg-color: #f8f9fa; --card-bg: #ffffff; --text-main: #1a1a1a;
+            --text-dim: #6c757d; --border: #e0e0e0; --nav-bg: #ffffff;
+            --shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); transition: 0.3s; }
+
+        /* --- NAVIGATION --- */
+        nav { 
+            background: var(--nav-bg); padding: 15px 5%; display: flex; 
+            justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); 
+            transition: 0.3s;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1200');
+            background-size: cover; background-position: center;
+            height: 300px; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center; color: white;
+            padding: 0 20px;
+        }
+        .hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 10px; }
+        .hero p { font-size: 1.1rem; opacity: 0.9; margin-bottom: 30px; }
+
+        /* --- SEARCH BOX --- */
+        .search-box {
+            background: var(--card-bg); width: 100%; max-width: 700px;
+            padding: 8px; border-radius: 50px; display: flex;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            margin: -35px auto 40px;
+        }
+        .search-box input {
+            flex: 1; border: none; background: none; padding: 15px 25px;
+            color: var(--text-main); font-size: 1rem; outline: none;
+        }
+
+        .filter-container { margin-bottom: 40px; text-align: center; }
+        .loc-btn { 
+            background: var(--card-bg); color: var(--text-dim); 
+            border: 1px solid var(--border); padding: 10px 22px; border-radius: 25px; 
+            cursor: pointer; transition: 0.3s; font-weight: 600; margin: 5px;
+        }
+        .loc-btn:hover, .loc-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* --- GRID --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        
+        .card { 
+            background: var(--card-bg); border-radius: 25px; overflow: hidden; 
+            border: 1px solid var(--border); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; cursor: pointer;
+        }
+        .card:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .card img { width: 100%; height: 220px; object-fit: cover; }
+        
+        /* --- THEME TOGGLE ANIMATION --- */
+        .theme-rotate-wrapper {
+            width: 40px; height: 40px; background: var(--card-bg); border-radius: 50%;
+            border: 1px solid var(--border); position: relative; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .theme-ball { 
+            position: relative; width: 100%; height: 100%; display: flex; 
+            align-items: center; justify-content: center; 
+            transition: transform 0.6s ease-in-out; 
+        }
+        .theme-ball span { position: absolute; font-size: 1.2rem; }
+        .icon-sun { transform: translateY(40px); opacity: 0; }
+        body.light-mode .theme-ball { transform: rotate(360deg); }
+        body.light-mode .icon-sun { transform: translateY(0); opacity: 1; }
+        body.light-mode .icon-moon { transform: translateY(-40px); opacity: 0; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" style="text-decoration: none;">
+            <span style="color: #ff4757; font-size: 1.6rem; font-weight: 800;">DineDash</span>
+        </a>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="display: flex; gap: 20px; align-items: center;">
+        <button class="theme-btn" onclick="handleThemeToggle()" style="background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 8px 18px; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">
+            🌓 Light/Dark Mode
+        </button>
+            
+            </div>
+            <a href="dashboard.html" id="navDashLink" style="background: #ff4757; color: white; padding: 10px 22px; border-radius: 25px; text-decoration: none; font-size: 0.9rem; font-weight: 800;">My Dashboard 👤</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Discover Hyderabad's Best</h1>
+        <p>From Jubilee Hills to Banjara Hills, find the perfect plate.</p>
+    </section>
+
+    <div class="container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search cuisines or restaurants..." onkeyup="filterResults()">
+        </div>
+
+        <div class="filter-container">
+            <button class="loc-btn active" onclick="filterByLocation('All', this)">All Hyderabad</button>
+            <button class="loc-btn" onclick="filterByLocation('Jubilee Hills', this)">Jubilee Hills</button>
+            <button class="loc-btn" onclick="filterByLocation('Banjara Hills', this)">Banjara Hills</button>
+        </div>
+
+        <div class="grid" id="restaurantGrid"></div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>
+        function displayRestaurants(list) {
+            const grid = document.getElementById('restaurantGrid');
+            if (!grid) return;
+            grid.innerHTML = list.map(r => `
+                <div class="card" onclick="goToDetail(${r.id})">
+                    <img src="${r.image}" alt="${r.name}">
+                    <div style="padding: 20px;">
+                        <h3>${r.name}</h3>
+                        <p style="color: var(--text-dim); font-size: 0.9rem;">${r.cuisine} • ${r.location}</p>
+                    </div>
+                </div>`).join('');
+        }
+
+        // --- UNIFIED INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTheme(); // Set background and classes
+            updateNavGreeting(); // Personalized navbar
+            
+            if (typeof restaurants !== 'undefined') {
+                displayRestaurants(restaurants);
+            }
+        });
+    </script>
+</body>
+</html>

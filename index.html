@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DineDash | Hyderabad's Finest</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f0f0f; color: white; overflow-x: hidden; }
+        
+        /* Top Navigation for Login Access */
+        .top-nav {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 30px 50px;
+            z-index: 100;
+        }
+
+        .login-link {
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 25px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-weight: bold;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .login-link:hover {
+            background: #ff4757;
+            border-color: #ff4757;
+        }
+
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1600');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .logo { font-size: 4rem; font-weight: 800; color: #ff4757; margin-bottom: 1rem; letter-spacing: -2px; }
+        .tagline { font-size: 1.5rem; margin-bottom: 2rem; color: #ccc; max-width: 600px; }
+        
+        .cta-btn {
+            background: #ff4757;
+            color: white;
+            padding: 18px 45px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: 0.3s transform ease;
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.4);
+        }
+        .cta-btn:hover { transform: scale(1.05); background: #ff6b81; }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <a href="login.html" class="login-link" id="navAuthBtn">Login / Sign Up 🔑</a>
+    </nav>
+
+    <div class="hero">
+        <div class="logo">DineDash</div>
+        <h1 class="tagline">Discover & Book the Best Restaurants in Hyderabad</h1>
+        <a href="restaurants.html" class="cta-btn">Explore Restaurants</a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

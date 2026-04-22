@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Booking - DineDash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2d3436;
+            --text-dim: #636e72;
+            --border: #dfe6e9;
+            --nav-bg: #ffffff;
+            --input-bg: #fdfdfd;
+            --accent: #ff4757;
+            --gold: #d4af37;
+            --shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode {
+            --bg-color: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --text-main: #ffffff;
+            --text-dim: #888888;
+            --border: #333333;
+            --nav-bg: #1a1a1a;
+            --input-bg: #121212;
+            --shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: 0.3s; }
+        body { background: var(--bg-color); color: var(--text-main); line-height: 1.6; }
+
+        /* --- NAVIGATION --- */
+        nav { 
+            background: var(--nav-bg); padding: 12px 6%; display: flex; 
+            justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); 
+        }
+
+        .theme-rotate-wrapper {
+            width: 40px; height: 40px; background: var(--card-bg); border-radius: 50%;
+            border: 1px solid var(--border); position: relative; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .theme-ball { 
+            position: relative; width: 100%; height: 100%; display: flex; 
+            align-items: center; justify-content: center; 
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .theme-ball span { position: absolute; font-size: 1.2rem; }
+        .icon-sun { transform: translateY(40px); opacity: 0; }
+        
+        body.dark-mode .theme-ball { transform: rotate(360deg); }
+        body.dark-mode .icon-sun { transform: translateY(0); opacity: 1; }
+        body.dark-mode .icon-moon { transform: translateY(-40px); opacity: 0; }
+
+        /* --- SUCCESS POPUP MODAL --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: none; justify-content: center;
+            align-items: center; z-index: 2000; backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background: var(--card-bg); padding: 50px; border-radius: 35px;
+            border: 1px solid var(--gold); text-align: center; max-width: 450px; width: 90%;
+            transform: scale(0.8); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        .container { max-width: 1200px; margin: 0 auto 40px; padding: 0 20px; }
+        .back-nav { padding: 20px 0 10px; }
+        .back-link { color: var(--accent); text-decoration: none; font-weight: 800; font-size: 0.9rem; }
+        
+        .venue-gallery { 
+            display: grid; grid-template-columns: 1.5fr 1fr; 
+            gap: 20px; height: 400px; margin-bottom: 40px;
+        }
+        .gallery-main img, .gallery-side img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            border-radius: 35px; border: 1px solid var(--border); 
+        }
+        .gallery-side { display: grid; grid-template-rows: 1fr 1fr; gap: 20px; }
+
+        .main-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; align-items: stretch; }
+
+        .booking-card { 
+            background: var(--card-bg); padding: 40px; 
+            border-radius: 40px; box-shadow: var(--shadow); border: 1px solid var(--border);
+        }
+
+        /* --- IMPROVED BUDGET BOX --- */
+        .price-summary { 
+            background: var(--card-bg); color: var(--text-main); 
+            padding: 40px; border-radius: 40px; border: 2px solid var(--accent);
+            display: flex; flex-direction: column; justify-content: center; box-shadow: var(--shadow);
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .field { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 10px; color: var(--text-dim); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        
+        input, select, textarea { 
+            width: 100%; padding: 14px; border-radius: 12px; 
+            border: 1px solid var(--border); background: var(--input-bg); 
+            color: var(--text-main); font-size: 0.95rem; outline: none;
+        }
+
+        .price-item { 
+            display: flex; justify-content: space-between; 
+            margin-bottom: 15px; border-bottom: 1px solid var(--border); 
+            padding-bottom: 8px; font-weight: 600;
+        }
+
+        .submit-btn { 
+            width: 100%; padding: 18px; background: var(--accent); color: #ffffff; 
+            border: none; border-radius: 15px; font-weight: 800; font-size: 1.1rem; 
+            cursor: pointer; margin-top: 20px;
+        }
+
+        .btn-call {
+            display: block; width: 100%; text-align: center; padding: 15px;
+            background: var(--text-main); color: var(--card-bg); text-decoration: none;
+            border-radius: 15px; font-weight: 800; margin-top: 15px;
+        }
+
+        @media (max-width: 900px) { .main-grid, .venue-gallery { grid-template-columns: 1fr; height: auto; } }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🛎️</div>
+            <h2 style="font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 10px;">Inquiry Received!</h2>
+            <p style="color: var(--text-dim); margin-bottom: 30px;">Your event details have been sent to our manager. You can track this in your dashboard.</p>
+            <button onclick="window.location.href='dashboard.html'" class="submit-btn" style="background: var(--accent);">View My Dashboard</button>
+        </div>
+    </div>
+
+    <nav>
+        <a href="index.html" style="text-decoration: none; font-family: 'Playfair Display', serif;">
+            <span style="color: var(--accent); font-size: 1.8rem; font-weight: 900;">DineDash</span>
+        </a>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="display: flex; gap: 20px; align-items: center;">
+        <button class="theme-btn" onclick="handleThemeToggle()" style="background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 8px 18px; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">
+            🌓 Light/Dark Mode
+        </button>
+            
+            </div>
+            <a href="dashboard.html" style="background: var(--accent); color: white; padding: 10px 22px; border-radius: 50px; text-decoration: none; font-size: 0.9rem; font-weight: 800;">Dashboard 👤</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="back-nav">
+            <a href="restaurant.html" class="back-link">← Return to Restaurant</a>
+        </div>
+
+        <div class="venue-gallery">
+            <div class="gallery-main"><img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800"></div>
+            <div class="gallery-side">
+                <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400">
+                <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400">
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="booking-card">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.2rem; margin-bottom: 25px;">Event Details</h2>
+                <form id="eventForm">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Host Name</label>
+                            <input type="text" id="contactName" placeholder="Full Name" required>
+                        </div>
+                        <div class="field">
+                            <label>Event Category</label>
+                            <select id="eventType" onchange="calculateEstimate()">
+                                <option value="Birthday Party">Birthday Party</option>
+                                <option value="Wedding / Engagement">Wedding / Engagement</option>
+                                <option value="Corporate Meeting">Corporate Meeting</option>
+                                <option value="Anniversary Gala">Anniversary Gala</option>
+                                <option value="Product Launch">Product Launch</option>
+                                <option value="Cocktail Social">Cocktail Social</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Total Guests (Min 30)</label>
+                            <input type="number" id="guestCount" value="30" min="30" oninput="calculateEstimate()">
+                        </div>
+                        <div class="field">
+                            <label>Event Date</label>
+                            <input type="date" id="eventDate" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Special Notes</label>
+                        <textarea id="eventDetails" rows="4" placeholder="Catering, DJ, Floral decor..."></textarea>
+                    </div>
+                    <div class="field">
+                        <label>Contact Number</label>
+                        <input type="tel" id="customerPhone" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                    </div>
+                </form>
+            </div>
+
+            <div class="price-summary">
+                <h3 style="margin-bottom: 20px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold);">Estimated Budget</h3>
+                <div class="price-item"><span>Catering (Per Plate)</span><span id="pricePerPlate">₹550</span></div>
+                <div class="price-item"><span>Venue Hall Fee</span><span id="hallFee">₹15,000</span></div>
+                <div class="price-item" style="border: none; margin-top: 20px; font-size: 2.2rem; font-weight: 900; color: var(--accent);">
+                    <span id="estTotal">₹31,500</span>
+                </div>
+                <button type="submit" form="eventForm" class="submit-btn">Send Inquiry ✉️</button>
+                
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border); text-align: center;">
+                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 10px;">Having any questions?</p>
+                    <a href="tel:+919876543210" class="btn-call">📞 Call Event Manager</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+    function applyTheme() {
+        const theme = localStorage.getItem('theme') || 'dark';
+        if (theme === 'dark') document.body.classList.add('dark-mode');
+        else document.body.classList.remove('dark-mode');
+    }
+
+    function handleThemeToggle() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
+
+    function calculateEstimate() {
+        const guests = parseInt(document.getElementById('guestCount').value) || 0;
+        const type = document.getElementById('eventType').value;
+        let platePrice = 550; 
+        let hallPrice = 15000;
+
+        if (type.includes('Wedding')) { platePrice = 950; hallPrice = 35000; }
+        else if (type.includes('Corporate') || type.includes('Launch')) { platePrice = 1200; hallPrice = 20000; }
+
+        document.getElementById('pricePerPlate').innerText = `₹${platePrice}`;
+        document.getElementById('hallFee').innerText = `₹${hallPrice.toLocaleString('en-IN')}`;
+        document.getElementById('estTotal').innerText = `₹${((guests * platePrice) + hallPrice).toLocaleString('en-IN')}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        applyTheme();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('eventDate').setAttribute('min', today);
+        calculateEstimate();
+    });
+
+    document.getElementById('eventForm').onsubmit = function(e) {
+    e.preventDefault();
+    
+    const inquiryData = {
+        id: "EVT" + Date.now(),
+        name: document.getElementById('contactName').value,
+        phone: document.getElementById('customerPhone').value,
+        restaurantName: localStorage.getItem('selectedRestaurantName') || "DineDash Venue",
+        // ADD THIS LINE - Dashboard needs this
+        category: 'Event', 
+        // CHANGE THIS - Admin panel needs this
+        type: 'Banquet Hall', 
+        date: document.getElementById('eventDate').value,
+        total: document.getElementById('estTotal').innerText.replace('₹', ''),
+        details: document.getElementById('eventDetails').value,
+        status: "Pending"
+    };
+
+    const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+    bookings.push(inquiryData);
+    localStorage.setItem('bookings', JSON.stringify(bookings));
+
+    document.getElementById('successModal').classList.add('active');
+};
+    </script>
+</body>
+</html>
